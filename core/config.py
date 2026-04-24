@@ -43,6 +43,7 @@ class ProxyConfig:
 @dataclass
 class ProviderConfig:
     enable_twitter: bool = True
+    enable_douyin: bool = True
 
 
 @dataclass
@@ -54,6 +55,11 @@ class ReactionConfig:
     emoji_type: str = "1"
 
 
+@dataclass
+class DebugConfig:
+    enabled: bool = False
+
+
 class ConfigManager:
     def __init__(self, raw: dict):
         self._raw = raw or {}
@@ -63,6 +69,7 @@ class ConfigManager:
         self.proxy = ProxyConfig()
         self.providers = ProviderConfig()
         self.reaction = ReactionConfig()
+        self.debug = DebugConfig()
         self._parse()
 
     def _parse(self) -> None:
@@ -104,7 +111,8 @@ class ConfigManager:
 
         providers = self._raw.get("providers", {}) or {}
         self.providers = ProviderConfig(
-            enable_twitter=bool(providers.get("twitter", True))
+            enable_twitter=bool(providers.get("twitter", True)),
+            enable_douyin=bool(providers.get("douyin", True)),
         )
 
         reaction = self._raw.get("reaction", {}) or {}
@@ -114,4 +122,9 @@ class ConfigManager:
             success_emoji=str(reaction.get("success_emoji", "👌") or "👌"),
             failed_emoji=str(reaction.get("failed_emoji", "😭") or "😭"),
             emoji_type=str(reaction.get("emoji_type", "1") or "1"),
+        )
+
+        debug = self._raw.get("debug", {}) or {}
+        self.debug = DebugConfig(
+            enabled=bool(debug.get("enabled", False)),
         )

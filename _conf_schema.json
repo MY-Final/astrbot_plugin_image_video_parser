@@ -117,12 +117,28 @@
             }
         }
     },
+    "debug": {
+        "description": "调试日志",
+        "type": "object",
+        "items": {
+            "enabled": {
+                "description": "启用插件调试日志",
+                "type": "bool",
+                "default": false
+            }
+        }
+    },
     "providers": {
         "description": "解析平台开关",
         "type": "object",
         "items": {
             "twitter": {
                 "description": "启用 Twitter/X 解析",
+                "type": "bool",
+                "default": true
+            },
+            "douyin": {
+                "description": "启用 Douyin 解析（直播链接自动忽略）",
                 "type": "bool",
                 "default": true
             }
