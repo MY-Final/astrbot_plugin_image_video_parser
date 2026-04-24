@@ -9,20 +9,22 @@ from .core import ConfigManager
 from .core.downloader import ensure_media_files
 from .core.message_adapter import build_media_nodes, build_text_node
 from .core.parser import ParserManager
-from .core.parser.platform import TwitterXParser
+from .core.parser.platform import TwitterXParser, DouyinParser
 from .core.reaction import EmojiLikeReactor
 
 
 @register(
     "astrbot_plugin_image_video_parser",
     "final",
-    "解析插件（当前支持 X 解析）",
+    "解析插件（当前支持 X 与 Douyin 解析）",
     "1.0.0",
 )
 class ImageVideoParserPlugin(Star):
     def __init__(self, context: Context, config: dict | None = None):
         super().__init__(context)
         self.cfg = ConfigManager(config or {})
+        self.debug_enabled = self.cfg.debug.enabled
+
         parsers = []
 
         if self.cfg.providers.enable_twitter:
@@ -34,6 +36,9 @@ class ImageVideoParserPlugin(Star):
                     proxy_url=self.cfg.proxy.address or None,
                 )
             )
+
+        if self.cfg.providers.enable_douyin:
+            parsers.append(DouyinParser())
 
         self.parser_manager = ParserManager(parsers) if parsers else None
         self.reactor = EmojiLikeReactor(
@@ -93,8 +98,16 @@ class ImageVideoParserPlugin(Star):
                 if self.cfg.message.rich_media:
                     media_nodes = build_media_nodes(metadata, prefer_local=True)
                     if media_nodes:
-                        await event.send(event.chain_result(media_nodes))
-                        sent_media = True
+                        try:
+                            await event.send(event.chain_result(media_nodes))
+                            sent_media = True
+                        except Exception as e:
+                            if self.debug_enabled:
+                                logger.debug(f"本地媒体发送失败，回退URL发送: {e}")
+                            fallback_nodes = build_media_nodes(metadata, prefer_local=False)
+                            if fallback_nodes:
+                                await event.send(event.chain_result(fallback_nodes))
+                                sent_media = True
                     elif metadata.get("error"):
                         logger.warning(f"媒体节点为空，解析错误: {metadata.get('error')}")
 
