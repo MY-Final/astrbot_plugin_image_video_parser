@@ -1,0 +1,131 @@
+{
+    "trigger": {
+        "description": "触发设置",
+        "type": "object",
+        "items": {
+            "auto_parse": {
+                "description": "自动解析链接",
+                "type": "bool",
+                "default": true
+            },
+            "keywords": {
+                "description": "手动触发关键词",
+                "type": "list",
+                "hint": "当 auto_parse 关闭时，消息包含关键词才触发",
+                "default": [
+                    "解析",
+                    "解析视频",
+                    "解析推文"
+                ]
+            }
+        }
+    },
+    "message": {
+        "description": "消息输出",
+        "type": "object",
+        "items": {
+            "text_metadata": {
+                "description": "发送文本元数据",
+                "type": "bool",
+                "default": true
+            },
+            "rich_media": {
+                "description": "发送富媒体",
+                "type": "bool",
+                "default": true
+            }
+        }
+    },
+    "download": {
+        "description": "下载设置",
+        "type": "object",
+        "items": {
+            "pre_download_all_media": {
+                "description": "预下载全部媒体",
+                "type": "bool",
+                "hint": "开启后图片和视频都会先下载再发送",
+                "default": true
+            },
+            "cache_dir": {
+                "description": "缓存目录",
+                "type": "string",
+                "default": "/app/sharedFolder/image_video_parser/cache"
+            }
+        }
+    },
+    "proxy": {
+        "description": "代理设置",
+        "type": "object",
+        "items": {
+            "address": {
+                "description": "代理地址",
+                "type": "string",
+                "hint": "例如 http://127.0.0.1:7890",
+                "default": ""
+            },
+            "twitter": {
+                "description": "Twitter/X 代理开关",
+                "type": "object",
+                "items": {
+                    "parse": {
+                        "description": "解析请求使用代理",
+                        "type": "bool",
+                        "default": false
+                    },
+                    "image": {
+                        "description": "图片下载使用代理",
+                        "type": "bool",
+                        "default": true
+                    },
+                    "video": {
+                        "description": "视频下载使用代理",
+                        "type": "bool",
+                        "default": true
+                    }
+                }
+            }
+        }
+    },
+    "reaction": {
+        "description": "消息表情反馈",
+        "type": "object",
+        "items": {
+            "enabled": {
+                "description": "启用表情反馈",
+                "type": "bool",
+                "default": true
+            },
+            "detect_emoji_id": {
+                "description": "检测到链接时贴附表情ID",
+                "type": "string",
+                "default": "265"
+            },
+            "success_emoji": {
+                "description": "解析成功表情（ID或字符）",
+                "type": "string",
+                "default": "👌"
+            },
+            "failed_emoji": {
+                "description": "解析失败表情（ID或字符）",
+                "type": "string",
+                "default": "😭"
+            },
+            "emoji_type": {
+                "description": "表情类型",
+                "type": "string",
+                "default": "1"
+            }
+        }
+    },
+    "providers": {
+        "description": "解析平台开关",
+        "type": "object",
+        "items": {
+            "twitter": {
+                "description": "启用 Twitter/X 解析",
+                "type": "bool",
+                "default": true
+            }
+        }
+    }
+}

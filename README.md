@@ -1,14 +1,27 @@
-# astrbot-plugin-helloworld
+# 解析插件
 
-AstrBot 插件模板 / A template plugin for AstrBot plugin feature
+当前版本为聚合解析框架的第一步实现，已支持 **X(Twitter/X) 链接解析**。
 
-> [!NOTE]
-> This repo is just a template of [AstrBot](https://github.com/AstrBotDevs/AstrBot) Plugin.
-> 
-> [AstrBot](https://github.com/AstrBotDevs/AstrBot) is an agentic assistant for both personal and group conversations. It can be deployed across dozens of mainstream instant messaging platforms, including QQ, Telegram, Feishu, DingTalk, Slack, LINE, Discord, Matrix, etc. In addition, it provides a reliable and extensible conversational AI infrastructure for individuals, developers, and teams. Whether you need a personal AI companion, an intelligent customer support agent, an automation assistant, or an enterprise knowledge base, AstrBot enables you to quickly build AI applications directly within your existing messaging workflows.
+## 当前能力
 
-# Supports
+- 自动识别消息中的 X/Twitter 状态链接
+- 解析文本元数据（标题/作者/简介/发布时间）
+- 下载并发送图片/视频媒体
+- 三态表情反馈（引用原消息贴附）
+  - 检测到可解析链接：`#265`
+  - 解析成功：`#👌`
+  - 解析失败：`#😭`
 
-- [AstrBot Repo](https://github.com/AstrBotDevs/AstrBot)
-- [AstrBot Plugin Development Docs (Chinese)](https://docs.astrbot.app/dev/star/plugin-new.html)
-- [AstrBot Plugin Development Docs (English)](https://docs.astrbot.app/en/dev/star/plugin-new.html)
+## 配置说明（关键项）
+
+- `providers.twitter`: 是否启用 X 解析
+- `proxy.address`: 代理地址（示例：`http://127.0.0.1:7890`）
+- `proxy.twitter.parse/image/video`: 解析/图片/视频代理开关
+- `download.pre_download_all_media`: 是否预下载媒体（默认开启）
+- `download.cache_dir`: 缓存目录（Docker 默认 `/app/sharedFolder/image_video_parser/cache`）
+- `reaction.enabled`: 是否启用三态表情反馈
+- `reaction.detect_emoji_id/success_emoji/failed_emoji`: 三态表情配置
+
+## 说明
+
+目前实现聚焦 X 解析，后续可在同一框架下继续扩展其它平台解析器。
