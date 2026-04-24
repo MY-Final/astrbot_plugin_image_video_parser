@@ -44,6 +44,7 @@ class ProxyConfig:
 class ProviderConfig:
     enable_twitter: bool = True
     enable_douyin: bool = True
+    enable_bilibili: bool = True
 
 
 @dataclass
@@ -53,6 +54,12 @@ class ReactionConfig:
     success_emoji: str = "👌"
     failed_emoji: str = "😭"
     emoji_type: str = "1"
+
+
+@dataclass
+class BilibiliConfig:
+    max_video_minutes: int = 0
+    over_limit_message: str = "视频较长，请前往B站观看：{url}"
 
 
 @dataclass
@@ -69,6 +76,7 @@ class ConfigManager:
         self.proxy = ProxyConfig()
         self.providers = ProviderConfig()
         self.reaction = ReactionConfig()
+        self.bilibili = BilibiliConfig()
         self.debug = DebugConfig()
         self._parse()
 
@@ -113,6 +121,7 @@ class ConfigManager:
         self.providers = ProviderConfig(
             enable_twitter=bool(providers.get("twitter", True)),
             enable_douyin=bool(providers.get("douyin", True)),
+            enable_bilibili=bool(providers.get("bilibili", True)),
         )
 
         reaction = self._raw.get("reaction", {}) or {}
@@ -122,6 +131,20 @@ class ConfigManager:
             success_emoji=str(reaction.get("success_emoji", "👌") or "👌"),
             failed_emoji=str(reaction.get("failed_emoji", "😭") or "😭"),
             emoji_type=str(reaction.get("emoji_type", "1") or "1"),
+        )
+
+        bilibili = self._raw.get("bilibili", {}) or {}
+        max_minutes_raw = bilibili.get("max_video_minutes", 0)
+        try:
+            max_minutes = int(max_minutes_raw)
+        except (TypeError, ValueError):
+            max_minutes = 0
+        self.bilibili = BilibiliConfig(
+            max_video_minutes=max(0, max_minutes),
+            over_limit_message=str(
+                bilibili.get("over_limit_message", "视频较长，请前往B站观看：{url}")
+                or "视频较长，请前往B站观看：{url}"
+            ),
         )
 
         debug = self._raw.get("debug", {}) or {}

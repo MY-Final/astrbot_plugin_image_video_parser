@@ -21,6 +21,8 @@ class ParseResult:
     use_image_proxy: bool = False
     use_video_proxy: bool = False
     proxy_url: Optional[str] = None
+    duration_seconds: int = 0
+    media_blocked_message: str = ""
 
     def as_dict(self) -> Dict[str, Any]:
         return {
@@ -39,4 +41,6 @@ class ParseResult:
             "use_image_proxy": self.use_image_proxy,
             "use_video_proxy": self.use_video_proxy,
             "proxy_url": self.proxy_url,
+            "duration_seconds": self.duration_seconds,
+            "media_blocked_message": self.media_blocked_message,
         }

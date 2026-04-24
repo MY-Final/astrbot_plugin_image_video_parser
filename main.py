@@ -2,6 +2,7 @@ import aiohttp
 
 from astrbot.api import logger
 from astrbot.api.event import filter, AstrMessageEvent
+from astrbot.api.message_components import Plain
 from astrbot.api.star import Context, Star, register
 from astrbot.core.star.filter.event_message_type import EventMessageType
 
@@ -9,14 +10,14 @@ from .core import ConfigManager
 from .core.downloader import ensure_media_files
 from .core.message_adapter import build_media_nodes, build_text_node
 from .core.parser import ParserManager
-from .core.parser.platform import TwitterXParser, DouyinParser
+from .core.parser.platform import TwitterXParser, DouyinParser, BilibiliParser
 from .core.reaction import EmojiLikeReactor
 
 
 @register(
     "astrbot_plugin_image_video_parser",
     "final",
-    "解析插件（当前支持 X 与 Douyin 解析）",
+    "解析插件（当前支持 X / Douyin / Bilibili 解析）",
     "1.0.0",
 )
 class ImageVideoParserPlugin(Star):
@@ -39,6 +40,14 @@ class ImageVideoParserPlugin(Star):
 
         if self.cfg.providers.enable_douyin:
             parsers.append(DouyinParser())
+
+        if self.cfg.providers.enable_bilibili:
+            parsers.append(
+                BilibiliParser(
+                    max_video_minutes=self.cfg.bilibili.max_video_minutes,
+                    over_limit_message=self.cfg.bilibili.over_limit_message,
+                )
+            )
 
         self.parser_manager = ParserManager(parsers) if parsers else None
         self.reactor = EmojiLikeReactor(
@@ -86,6 +95,13 @@ class ImageVideoParserPlugin(Star):
                     if text_node:
                         await event.send(event.chain_result([text_node]))
 
+                if metadata.get("media_blocked_message"):
+                    blocked_text = str(metadata.get("media_blocked_message") or "").strip()
+                    if blocked_text:
+                        await event.send(event.chain_result([Plain(blocked_text)]))
+                        any_success = True
+                    continue
+
                 file_paths = await ensure_media_files(
                     session,
                     metadata,
@@ -106,8 +122,12 @@ class ImageVideoParserPlugin(Star):
                                 logger.debug(f"本地媒体发送失败，回退URL发送: {e}")
                             fallback_nodes = build_media_nodes(metadata, prefer_local=False)
                             if fallback_nodes:
-                                await event.send(event.chain_result(fallback_nodes))
-                                sent_media = True
+                                try:
+                                    await event.send(event.chain_result(fallback_nodes))
+                                    sent_media = True
+                                except Exception as fallback_error:
+                                    if self.debug_enabled:
+                                        logger.debug(f"URL媒体回退发送失败: {fallback_error}")
                     elif metadata.get("error"):
                         logger.warning(f"媒体节点为空，解析错误: {metadata.get('error')}")
 

@@ -117,6 +117,24 @@
             }
         }
     },
+    "bilibili": {
+        "description": "Bilibili 解析策略",
+        "type": "object",
+        "items": {
+            "max_video_minutes": {
+                "description": "B站视频最大自动发送时长（分钟）",
+                "type": "int",
+                "hint": "0 表示不限制；超过阈值时仅提示去B站观看",
+                "default": 0
+            },
+            "over_limit_message": {
+                "description": "超时长提示文案",
+                "type": "string",
+                "hint": "可用占位符：{url} {title} {duration_seconds} {limit_minutes}",
+                "default": "视频较长，请前往B站观看：{url}"
+            }
+        }
+    },
     "debug": {
         "description": "调试日志",
         "type": "object",
@@ -139,6 +157,11 @@
             },
             "douyin": {
                 "description": "启用 Douyin 解析（直播链接自动忽略）",
+                "type": "bool",
+                "default": true
+            },
+            "bilibili": {
+                "description": "启用 Bilibili 解析（直播链接自动忽略）",
                 "type": "bool",
                 "default": true
             }
